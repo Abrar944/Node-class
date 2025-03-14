@@ -5,6 +5,7 @@ pipeline {
         IMAGE_NAME = "nodejs-app"
         CONTAINER_NAME = "nodejs-container"
         DOCKER_HUB_USER = "ahmedbhai"
+        DOCKER_HUB_PASSWORD = "8686109633aA@"
     }
 
     stages {
@@ -25,7 +26,7 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    sh "echo ${8686109622aA@} | docker login -u ${DOCKER_HUB_USER} --password-stdin"
+                    sh "echo ${DOCKER_HUB_PASSWORD} | docker login -u ${DOCKER_HUB_USER} --password-stdin"
                     sh "docker tag ${IMAGE_NAME}:latest ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest"
                     sh "docker push ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest"
                 }
