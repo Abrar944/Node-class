@@ -1,45 +1,14 @@
 pipeline {
-    agent any
-
-    environment {
-        IMAGE_NAME = "nodejs-app"
-        CONTAINER_NAME = "nodejs-container"
+    agent {
+        docker { image 'node:16-alpine' }
     }
-
     stages {
-        stage('Clone Repository') {
-            steps {
-                git 'https://github.com/tutsmake/Simple-Node-JS-App.git'
-            }
-        }
-
-        stage('Build Docker Image') {
+        stage('Check Node Version') {
             steps {
                 script {
-                    sh "docker build -t ${IMAGE_NAME}:latest ."
+                    sh 'node -v'
                 }
             }
-        }
-
-        stage('Deploy on EC2') {
-            steps {
-                script {
-                    sh """
-                        docker stop ${CONTAINER_NAME} || true
-                        docker rm ${CONTAINER_NAME} || true
-                        docker run -d --name ${CONTAINER_NAME} -p 3000:3000 ${IMAGE_NAME}:latest
-                    """
-                }
-            }
-        }
-    }
-
-    post {
-        success {
-            echo 'Deployment Successful!'
-        }
-        failure {
-            echo 'Deployment Failed!'
         }
     }
 }
