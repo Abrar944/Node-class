@@ -2,44 +2,51 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "nodejs-app"
-        CONTAINER_NAME = "nodejs-container"
+        DOCKER_IMAGE = 'nodejs-app'
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Abrar944/Node-class.git'
+                // Checkout code from GitHub
+                git 'https://github.com/yourusername/your-repo.git'
             }
         }
 
-        stage('Build Docker Image') {
+                stage('Build Docker Image') {
             steps {
                 script {
-                    sh "docker build -t ${IMAGE_NAME}:latest ."
+                    // Build Docker image
+                    docker.build(DOCKER_IMAGE)
                 }
             }
         }
 
-        stage('Deploy on EC2') {
+        stage('Run Docker Container') {
             steps {
                 script {
-                    sh """
-                        docker stop ${CONTAINER_NAME} || true
-                        docker rm ${CONTAINER_NAME} || true
-                        docker run -d --name ${CONTAINER_NAME} -p 3000:3000 ${IMAGE_NAME}:latest
-                    """
+                    // Run Docker container
+                    docker.image(DOCKER_IMAGE).run('-d -p 3000:3000')
                 }
             }
         }
     }
 
     post {
-        success {
-            echo 'Deployment Successful!'
-        }
-        failure {
-            echo 'Deployment Failed!'
+        always {
+            // Clean up the Docker container after the build
+            script {
+                def containers = docker.ps('-q', '-f', "ancestor=${DOCKER_IMAGE}")
+                if (
+        always {
+            script {
+                // Clean up the Docker container after the build
+                def containers = docker.ps('-q', '-f', "ancestor=${DOCKER_IMAGE}")
+                if (containers) {
+                    docker.removeContainer(containers)
+                }
+            }
         }
     }
 }
+
