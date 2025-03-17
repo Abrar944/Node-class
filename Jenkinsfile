@@ -9,7 +9,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout code from GitHub
-                git ''
+                git 'https://github.com/Abrar944/Node-class.git'
             }
         }
 
