@@ -13,7 +13,7 @@ pipeline {
             }
         }
 
-                stage('Build Docker Image') {
+        stage('Build Docker Image') {
             steps {
                 script {
                     // Build Docker image
@@ -26,7 +26,7 @@ pipeline {
             steps {
                 script {
                     // Run Docker container
-                    docker.image(DOCKER_IMAGE).run('-d -p 3000:3000')
+                    sh "docker run -d -p 3000:3000 --name ${DOCKER_IMAGE} ${DOCKER_IMAGE}"
                 }
             }
         }
@@ -34,19 +34,13 @@ pipeline {
 
     post {
         always {
-            // Clean up the Docker container after the build
             script {
-                def containers = docker.ps('-q', '-f', "ancestor=${DOCKER_IMAGE}")
-                if (
-        always {
-            script {
-                // Clean up the Docker container after the build
-                def containers = docker.ps('-q', '-f', "ancestor=${DOCKER_IMAGE}")
+                // Clean up any running container from the previous build
+                def containers = sh(script: "docker ps -q -f ancestor=${DOCKER_IMAGE}", returnStdout: true).trim()
                 if (containers) {
-                    docker.removeContainer(containers)
+                    sh "docker rm -f ${containers}"
                 }
             }
         }
     }
 }
-
